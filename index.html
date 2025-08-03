@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retro Reload</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+    }
+
+    #bgVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .game-card {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+      transition: transform 0.3s ease;
+      width: 200px;
+    }
+
+    .game-card:hover {
+      transform: scale(1.03);
+    }
+
+    .game-card p {
+      margin-top: 0.5rem;
+      font-weight: bold;
+      color: #f472b6;
+    }
+
+    body {
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body class="text-white">
+
+  <!-- Background Video -->
+  <video autoplay muted loop id="bgVideo">
+    <source src="https://media.istockphoto.com/id/2198721284/video/neon-lights-road-with-geometric-shapes-vj-looped-animation.mp4?s=mp4-640x640-is&k=20&c=C90J9SCYL7_eqNUIF-eVeywi3avsfqNSZf-1EsNU9ks=" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Header -->
+  <header class="text-center pt-6 pb-2">
+    <h1 id="welcomeMsg" class="text-4xl font-bold text-pink-600 mb-1">WELCOME TO RETRO RELOAD</h1>
+    <p class="text-lg text-pink-400">classic games timeless fun</p>
+  </header>
+
+  <!-- Game Grid -->
+  <main class="flex items-start justify-center min-h-[80vh] px-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl w-full justify-items-center mt-4">
+      <button class="game-card game1">
+        <img src="./images/Sudoku.png" alt="Sudoku" />
+        <p>Sudoku</p>
+      </button>
+      <button class="game-card game2">
+        <img src="./images/rock.jpg" alt="Rock Paper Scissors" />
+        <p>Rock Paper Scissors</p>
+      </button>
+      <button class="game-card game3">
+        <img src="./images/snake.jpg" alt="Snake Game" />
+        <p>Snake</p>
+      </button>
+      <button class="game-card game4">
+        <img src="./images/memory card.jpg" alt="Memory Card" />
+        <p>Memory Card</p>
+      </button>
+    </div>
+  </main>
+
+  <!-- JavaScript -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const userType = localStorage.getItem('userType');
+      if (userType === 'guest') {
+        const welcome = document.getElementById('welcomeMsg');
+        if (welcome) {
+          welcome.innerText = "Welcome, Guest!";
+        }
+      }
+    });
+
+    document.querySelector(".game1").addEventListener("click", () => {
+      window.location.href = "./index1sudko.html";
+    });
+    document.querySelector(".game2").addEventListener("click", () => {
+      window.location.href = "./index2rock.html";
+    });
+    document.querySelector(".game3").addEventListener("click", () => {
+      window.location.href = "./index3snake.html";
+    });
+    document.querySelector(".game4").addEventListener("click", () => {
+      window.location.href = "./index4memorycard.html";
+    });
+  </script>
+</body>
+
+</html>

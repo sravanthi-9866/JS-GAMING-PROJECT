@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Memory Match Game</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      color: white;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Go Back Button Styles */
+    .go-back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 999;
+    }
+
+    .go-back-btn button {
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      background-color: #ffffff;
+      color: #00b894;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    .go-back-btn button:hover {
+      background-color: #d4f0d4;
+    }
+
+    h1 { margin: 10px 0; }
+
+    .game {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 10px;
+      margin-top: 60px; /* leave space for the fixed button */
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 10px;
+    }
+
+    .card-front {
+      background: #444;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background-color: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    #message {
+      font-size: 1.5rem;
+      margin-top: 20px;
+    }
+
+    #resetBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #00b894;
+      color: white;
+      cursor: pointer;
+      display: none;
+    }
+
+    #resetBtn:hover {
+      background-color: #00cec9;
+    }
+
+    @media (max-width: 480px) {
+      .game {
+        grid-template-columns: repeat(3, 80px);
+        gap: 8px;
+      }
+
+      .card {
+        width: 80px;
+        height: 80px;
+      }
+
+      .card-back {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="go-back-btn">
+    <a href="./index.html"><button>⬅ Go Back</button></a>
+  </div>
+
+  <h1>🧠 Memory Match</h1>
+  <div class="game" id="game"></div>
+  <p id="message"></p>
+  <button id="resetBtn" onclick="resetGame()">🔁 Play Again</button>
+
+  <audio id="match-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_a16a3bc1f7.mp3?filename=correct-2-46134.mp3"></audio>
+  <audio id="wrong-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_645b9b1f24.mp3?filename=error-2-44527.mp3"></audio>
+  <audio id="win-sound" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_9a226a8502.mp3?filename=success-1-6297.mp3"></audio>
+
+  <script>
+    const emojis = ['🍎', '🐶', '🚗', '⚽', '🎵', '🐱', '🌸', '🍕'];
+    const matchSound = document.getElementById("match-sound");
+    const wrongSound = document.getElementById("wrong-sound");
+    const winSound = document.getElementById("win-sound");
+    const game = document.getElementById("game");
+    const message = document.getElementById("message");
+    const resetBtn = document.getElementById("resetBtn");
+
+    let cards = [];
+    let flipped = [];
+    let matched = [];
+
+    function shuffle(array) {
+      return array.sort(() => 0.5 - Math.random());
+    }
+
+    function createCards() {
+      game.innerHTML = '';
+      message.textContent = '';
+      resetBtn.style.display = 'none';
+
+      cards = shuffle([...emojis, ...emojis]);
+      flipped = [];
+      matched = [];
+
+      cards.forEach((emoji, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front"></div>
+            <div class="card-back">${emoji}</div>
+          </div>
+        `;
+        card.addEventListener("click", () => flipCard(card, index, emoji));
+        game.appendChild(card);
+      });
+    }
+
+    function flipCard(card, index, emoji) {
+      if (flipped.length === 2 || card.classList.contains("flipped") || matched.includes(index)) return;
+
+      card.classList.add("flipped");
+      flipped.push({ card, index, emoji });
+
+      if (flipped.length === 2) {
+        const [a, b] = flipped;
+        if (a.emoji === b.emoji) {
+          matched.push(a.index, b.index);
+          matchSound.play();
+          flipped = [];
+
+          if (matched.length === cards.length) {
+            winSound.play();
+            message.textContent = "🎉 You Win!";
+            resetBtn.style.display = 'inline-block';
+          }
+        } else {
+          wrongSound.play();
+          setTimeout(() => {
+            a.card.classList.remove("flipped");
+            b.card.classList.remove("flipped");
+            flipped = [];
+          }, 800);
+        }
+      }
+    }
+
+    function resetGame() {
+      createCards();
+    }
+
+    // Start game on load
+    createCards();
+  </script>
+
+</body>
+</html>

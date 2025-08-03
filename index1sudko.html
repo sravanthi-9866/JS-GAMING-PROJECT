@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sudoku Game with Levels</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2em;
+    color: #333;
+  }
+
+  .level-select {
+    margin-bottom: 15px;
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 6px;
+  }
+
+  .sudoku-container {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(9, 40px);
+    gap: 2px;
+    justify-content: center;
+    margin: 20px auto;
+    padding: 5px;
+    border-radius: 10px;
+  }
+
+  input {
+    width: 38px;
+    height: 38px;
+    text-align: center;
+    font-size: 18px;
+    border: 1.5px solid #999;
+    outline: none;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+    transition: border-color 0.3s;
+  }
+
+  input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px #4CAF50;
+  }
+
+  input:disabled {
+    background-color: #eee;
+    font-weight: bold;
+    color: #555;
+    box-shadow: none;
+  }
+
+  button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background: #45a049;
+  }
+
+  #message {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  
+  /* Go Back Button Styles */
+  .go-back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 999;
+  }
+
+  .go-back-btn button {
+    padding: 10px 16px;
+    font-size: 16px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #4CAF50;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    transition: 0.3s ease;
+  }
+
+  .go-back-btn button:hover {
+    background-color: #d4f0d4;
+  }
+</style>
+</head>
+<body>
+
+  <div class="go-back-btn">
+    <a href="./index.html"><button>⬅ Go Back</button></a>
+  </div>
+
+  <h1>🧩 Sudoku Game</h1>
+
+  <select id="level" class="level-select" onchange="loadPuzzle()">
+    <option value="easy">Easy</option>
+    <option value="medium">Medium</option>
+    <option value="hard">Hard</option>
+  </select>
+
+  <div class="sudoku-container" id="sudoku"></div>
+  <button onclick="checkSolution()">Check Solution</button>
+  <p id="message"></p>
+
+<script>
+  const puzzles = {
+    easy: [
+      [5, 3, 0, 0, 7, 0, 0, 0, 0],
+      [6, 0, 0, 1, 9, 5, 0, 0, 0],
+      [0, 9, 8, 0, 0, 0, 0, 6, 0],
+      [8, 0, 0, 0, 6, 0, 0, 0, 3],
+      [4, 0, 0, 8, 0, 3, 0, 0, 1],
+      [7, 0, 0, 0, 2, 0, 0, 0, 6],
+      [0, 6, 0, 0, 0, 0, 2, 8, 0],
+      [0, 0, 0, 4, 1, 9, 0, 0, 5],
+      [0, 0, 0, 0, 8, 0, 0, 7, 9]
+    ],
+    medium: [
+      [0, 0, 0, 6, 0, 0, 4, 0, 0],
+      [7, 0, 0, 0, 0, 3, 6, 0, 0],
+      [0, 0, 0, 0, 9, 1, 0, 8, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 5, 0, 1, 8, 0, 0, 0, 3],
+      [0, 0, 0, 3, 0, 6, 0, 4, 5],
+      [0, 4, 0, 2, 0, 0, 0, 6, 0],
+      [9, 0, 3, 0, 0, 0, 0, 0, 0],
+      [0, 2, 0, 0, 0, 0, 1, 0, 0]
+    ],
+    hard: [
+      [0, 0, 0, 0, 0, 0, 2, 0, 0],
+      [0, 8, 0, 0, 0, 7, 0, 9, 0],
+      [6, 0, 2, 0, 0, 0, 5, 0, 0],
+      [0, 7, 0, 0, 6, 0, 0, 0, 0],
+      [0, 0, 0, 9, 0, 1, 0, 0, 0],
+      [0, 0, 0, 0, 2, 0, 0, 4, 0],
+      [0, 0, 5, 0, 0, 0, 6, 0, 3],
+      [0, 9, 0, 4, 0, 0, 0, 7, 0],
+      [0, 0, 6, 0, 0, 0, 0, 0, 0]
+    ]
+  };
+
+  let currentPuzzle;
+
+  function createSudokuGrid() {
+    const container = document.getElementById('sudoku');
+    container.innerHTML = '';
+
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.maxLength = 1;
+        input.pattern = "[1-9]";
+
+        if (currentPuzzle[row][col] !== 0) {
+          input.value = currentPuzzle[row][col];
+          input.disabled = true;
+        } else {
+          input.value = '';
+          input.disabled = false;
+        }
+
+        // Add thicker border between 3x3 boxes for clarity
+        if (col === 2 || col === 5) {
+          input.style.borderRight = "3px solid #666";
+        }
+        if (row === 2 || row === 5) {
+          input.style.borderBottom = "3px solid #666";
+        }
+
+        container.appendChild(input);
+      }
+    }
+    document.getElementById('message').textContent = '';
+  }
+
+  function loadPuzzle() {
+    const level = document.getElementById('level').value;
+    currentPuzzle = puzzles[level];
+    createSudokuGrid();
+  }
+
+  function checkSolution() {
+    const inputs = document.querySelectorAll('#sudoku input');
+    const grid = [];
+
+    for (let i = 0; i < 9; i++) {
+      grid[i] = [];
+      for (let j = 0; j < 9; j++) {
+        const val = inputs[i * 9 + j].value;
+        const num = val ? parseInt(val) : 0;
+        if (num < 1 || num > 9 || isNaN(num)) {
+          document.getElementById('message').textContent = 'You lose! Invalid number detected!';
+          return;
+        }
+        grid[i][j] = num;
+      }
+    }
+
+    if (isValidSudoku(grid)) {
+      document.getElementById('message').textContent = 'You win! 🎉';
+    } else {
+      document.getElementById('message').textContent = 'You lose! Try again.';
+    }
+  }
+
+  function isValidSudoku(grid) {
+    const seen = new Set();
+
+    for (let r = 0; r < 9; ++r) {
+      for (let c = 0; c < 9; ++c) {
+        const val = grid[r][c];
+        if (val === 0) return false; // incomplete means lose
+
+        const rowKey = `row${r}-${val}`;
+        const colKey = `col${c}-${val}`;
+        const boxKey = `box${Math.floor(r/3)}${Math.floor(c/3)}-${val}`;
+
+        if (seen.has(rowKey) || seen.has(colKey) || seen.has(boxKey)) {
+          return false;
+        }
+
+        seen.add(rowKey);
+        seen.add(colKey);
+        seen.add(boxKey);
+      }
+    }
+
+    return true;
+  }
+
+  // Load default puzzle on page load
+  window.onload = () => {
+    loadPuzzle();
+  };
+</script>
+</body>
+</html>

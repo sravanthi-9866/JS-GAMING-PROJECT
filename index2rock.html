@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rock Paper Scissors ✊✋✌️</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #232526, #414345);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #ffffff;
+      text-align: center;
+      position: relative;
+    }
+
+    .go-back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 999;
+    }
+
+    .go-back-btn button {
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      background-color: #ffffff;
+      color: #e53935;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    .go-back-btn button:hover {
+      background-color: #f8d7da;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .scoreboard {
+      display: flex;
+      gap: 40px;
+      margin-top: 10px;
+      font-size: 1.3rem;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 20px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .game-image {
+      aspect-ratio: 1 / 1;
+      height: 300px;
+      object-fit: cover;
+    }
+
+    button {
+      background: #ffffff;
+      color: #232526;
+      border: none;
+      padding: 16px 28px;
+      border-radius: 12px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+      background: #ffd54f;
+      color: #000;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      min-height: 60px;
+      line-height: 1.5;
+    }
+
+    .reset-btn {
+      margin-top: 20px;
+      background-color: #e53935;
+      color: white;
+      display: none;
+    }
+
+    .reset-btn:hover {
+      background-color: #ef5350;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .scoreboard {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      button {
+        font-size: 1.1rem;
+        padding: 14px 20px;
+      }
+
+      .result {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Go Back Button -->
+  <div class="go-back-btn">
+    <a href="./index.html"><button>⬅ Go Back</button></a>
+  </div>
+
+  <h1>Rock ✊ Paper ✋ Scissors ✌️</h1>
+
+  <div class="scoreboard">
+    <div>👤 You: <span id="userScore">0</span></div>
+    <div>💻 Computer: <span id="computerScore">0</span></div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="play('rock')" id="rockBtn">✊ Rock</button>
+    <button onclick="play('paper')" id="paperBtn">✋ Paper</button>
+    <button onclick="play('scissors')" id="scissorsBtn">✌️ Scissors</button>
+  </div>
+
+  <div class="result" id="result">First to 5 wins. Make your move!</div>
+
+  <button class="reset-btn" id="resetBtn" onclick="resetGame()">🔁 Reset Game</button>
+
+  <script>
+    const choices = ["rock", "paper", "scissors"];
+    const emojis = {
+      rock: "✊",
+      paper: "✋",
+      scissors: "✌️"
+    };
+
+    let userScore = 0;
+    let computerScore = 0;
+    const winningScore = 5;
+
+    const userScoreDisplay = document.getElementById("userScore");
+    const computerScoreDisplay = document.getElementById("computerScore");
+    const resultDisplay = document.getElementById("result");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const buttons = {
+      rock: document.getElementById("rockBtn"),
+      paper: document.getElementById("paperBtn"),
+      scissors: document.getElementById("scissorsBtn")
+    };
+
+    function play(userChoice) {
+      if (userScore >= winningScore || computerScore >= winningScore) return;
+
+      const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+      let resultText = `
+        You chose ${emojis[userChoice]} ${userChoice.toUpperCase()} <br>
+        Computer chose ${emojis[computerChoice]} ${computerChoice.toUpperCase()} <br><br>
+      `;
+
+      if (userChoice === computerChoice) {
+        resultText += "🤝 It's a tie!";
+      } else if (
+        (userChoice === "rock" && computerChoice === "scissors") ||
+        (userChoice === "paper" && computerChoice === "rock") ||
+        (userChoice === "scissors" && computerChoice === "paper")
+      ) {
+        userScore++;
+        resultText += "🎉 You win this round!";
+      } else {
+        computerScore++;
+        resultText += "💻 Computer wins this round!";
+      }
+
+      userScoreDisplay.textContent = userScore;
+      computerScoreDisplay.textContent = computerScore;
+      resultDisplay.innerHTML = resultText;
+
+      // Check for game over
+      if (userScore === winningScore || computerScore === winningScore) {
+        let finalMsg = userScore === winningScore ? "🏆 You won the game!" : "😓 Computer won the game!";
+        resultDisplay.innerHTML += `<br><strong>${finalMsg}</strong>`;
+        resetBtn.style.display = "inline-block";
+        disableGameButtons();
+      }
+    }
+
+    function resetGame() {
+      userScore = 0;
+      computerScore = 0;
+      userScoreDisplay.textContent = 0;
+      computerScoreDisplay.textContent = 0;
+      resultDisplay.innerHTML = "First to 5 wins. Make your move!";
+      resetBtn.style.display = "none";
+      enableGameButtons();
+    }
+
+    function disableGameButtons() {
+      buttons.rock.disabled = true;
+      buttons.paper.disabled = true;
+      buttons.scissors.disabled = true;
+    }
+
+    function enableGameButtons() {
+      buttons.rock.disabled = false;
+      buttons.paper.disabled = false;
+      buttons.scissors.disabled = false;
+    }
+  </script>
+
+</body>
+</html>

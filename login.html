@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url('https://img.freepik.com/free-vector/geometric-gradient-futuristic-background_23-2149116406.jpg?semt=ais_hybrid&w=740') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: rgba(0, 0, 0, 0.6); /* Dark transparent box */
+      color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      width: 300px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    /* Login button */
+    .login-container button#submit {
+      background-color: #1E90FF; /* Dodger Blue */
+      color: white;
+    }
+
+    .login-container button#submit:hover {
+      background-color: #187bcd;
+    }
+
+    /* Register button */
+    .login-container button:last-of-type {
+      background-color: #FF6347; /* Tomato */
+    }
+
+    .login-container button:last-of-type:hover {
+      background-color: #e6533a;
+    }
+
+    .login-container button:last-of-type a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="email" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit" id="submit">Login</button>
+      <div id="error" class="error"></div>
+    </form>
+    <button><a href="./register.html">Register here</a></button>
+  </div>
+
+  <script type="module" src="./login.js" defer></script>
+</body>
+</html>
